@@ -1,5 +1,8 @@
+"use client";
+
 import { AlertCircle, RefreshCcw } from "lucide-react";
 import type { ApiError } from "@/lib/schemas";
+import { useT } from "@/lib/i18n";
 
 type Props = {
   error: ApiError;
@@ -7,7 +10,8 @@ type Props = {
 };
 
 export function ErrorBanner({ error, onRetry }: Props) {
-  const { title, message } = describe(error);
+  const t = useT();
+  const { title, message } = describe(error, t);
   return (
     <div className="flex items-start gap-3 rounded-lg border border-accent-3/30 bg-accent-3/10 p-4">
       <AlertCircle className="mt-0.5 flex-shrink-0 text-accent-3" size={20} />
@@ -22,40 +26,42 @@ export function ErrorBanner({ error, onRetry }: Props) {
           className="inline-flex items-center gap-1.5 rounded-md border border-accent-3/40 px-3 py-1.5 text-xs font-medium text-accent-3 transition hover:bg-accent-3/20"
         >
           <RefreshCcw size={12} />
-          tentar de novo
+          {t("errors.retry")}
         </button>
       )}
     </div>
   );
 }
 
-function describe(err: ApiError): { title: string; message: string } {
+type T = (key: string, vars?: Record<string, string | number>) => string;
+
+function describe(err: ApiError, t: T): { title: string; message: string } {
   switch (err.error) {
     case "user_not_found":
       return {
-        title: "usuário não encontrado",
-        message: `não achei "${err.username}" no Letterboxd. confere se escreveu certo.`,
+        title: t("errors.userNotFoundTitle"),
+        message: t("errors.userNotFound", { user: err.username }),
       };
     case "private_watchlist":
       return {
-        title: "watchlist privada",
-        message: `a watchlist de "${err.username}" não está pública. peça pra ela liberar nas configurações de privacidade do Letterboxd.`,
+        title: t("errors.privateTitle"),
+        message: t("errors.private", { user: err.username }),
       };
     case "rate_limited":
       return {
-        title: "Letterboxd pediu pra esperar",
+        title: t("errors.rateLimitedTitle"),
         message: err.retryAfter
-          ? `o Letterboxd está limitando requisições. tente de novo em ${err.retryAfter}s.`
-          : "o Letterboxd está limitando requisições. tente de novo em alguns minutos.",
+          ? t("errors.rateLimited", { sec: err.retryAfter })
+          : t("errors.rateLimitedNoSec"),
       };
     case "scrape_failed":
       return {
-        title: "deu ruim no scraping",
-        message: err.message || "tente de novo em alguns instantes.",
+        title: t("errors.scrapeFailedTitle"),
+        message: err.message || t("errors.scrapeFailed"),
       };
     case "bad_request":
       return {
-        title: "input inválido",
+        title: t("errors.badRequestTitle"),
         message: err.message,
       };
   }

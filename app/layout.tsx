@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { LocaleProvider } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "O Que Assistir — filmes da sua watchlist do Letterboxd que cabem no seu tempo",
+  title: "what2watch — find what to watch from your Letterboxd watchlist",
   description:
-    "Diga seu usuário do Letterboxd e quanto tempo você tem livre. A gente te mostra os filmes da sua watchlist que dão pra assistir hoje.",
+    "Enter your Letterboxd username and how much free time you have. We'll show the movies from your watchlist that fit.",
 };
 
 export default function RootLayout({
@@ -13,8 +14,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <LocaleProvider>{children}</LocaleProvider>
+      </body>
     </html>
   );
 }

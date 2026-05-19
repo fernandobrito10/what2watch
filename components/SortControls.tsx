@@ -1,29 +1,37 @@
 "use client";
 
-import { ArrowDownNarrowWide, Clock, History, Sparkles, Star } from "lucide-react";
+import {
+  ArrowDownNarrowWide,
+  Clock,
+  History,
+  Sparkles,
+  Star,
+} from "lucide-react";
 import clsx from "clsx";
 import type { SortKey } from "@/lib/schemas";
+import { useT } from "@/lib/i18n";
 
 type Props = {
   value: SortKey;
   onChange: (next: SortKey) => void;
 };
 
-const OPTIONS: { key: SortKey; label: string; Icon: typeof Star }[] = [
-  { key: "rating", label: "melhor nota", Icon: Star },
-  { key: "oldest", label: "há mais tempo", Icon: History },
-  { key: "newest", label: "adicionados recente", Icon: Sparkles },
-  { key: "duration", label: "mais curtos", Icon: Clock },
+const OPTIONS: { key: SortKey; messageKey: string; Icon: typeof Star }[] = [
+  { key: "rating", messageKey: "sort.rating", Icon: Star },
+  { key: "oldest", messageKey: "sort.oldest", Icon: History },
+  { key: "newest", messageKey: "sort.newest", Icon: Sparkles },
+  { key: "duration", messageKey: "sort.duration", Icon: Clock },
 ];
 
 export function SortControls({ value, onChange }: Props) {
+  const t = useT();
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted">
         <ArrowDownNarrowWide size={14} />
-        ordenar por
+        {t("sort.label")}
       </span>
-      {OPTIONS.map(({ key, label, Icon }) => (
+      {OPTIONS.map(({ key, messageKey, Icon }) => (
         <button
           key={key}
           type="button"
@@ -36,7 +44,7 @@ export function SortControls({ value, onChange }: Props) {
           )}
         >
           <Icon size={12} />
-          {label}
+          {t(messageKey)}
         </button>
       ))}
     </div>

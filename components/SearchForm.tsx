@@ -3,6 +3,7 @@
 import { Clock, Search, User } from "lucide-react";
 import { useState } from "react";
 import clsx from "clsx";
+import { useT } from "@/lib/i18n";
 
 export type SearchValues = {
   user: string;
@@ -18,6 +19,7 @@ type Props = {
 type Mode = "minutes" | "until";
 
 export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
+  const t = useT();
   const [user, setUser] = useState(initialUser);
   const [mode, setMode] = useState<Mode>("minutes");
   const [minutes, setMinutes] = useState(120);
@@ -28,21 +30,18 @@ export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
     e.preventDefault();
     setError(null);
     if (!user.trim()) {
-      setError("Coloque seu usuário do Letterboxd");
+      setError(t("form.errorNoUser"));
       return;
     }
-    const mins =
-      mode === "minutes" ? minutes : minutesUntil(untilTime);
+    const mins = mode === "minutes" ? minutes : minutesUntil(untilTime);
     if (mins < 1) {
       setError(
-        mode === "until"
-          ? "Esse horário já passou. Tem certeza?"
-          : "Tempo precisa ser maior que zero",
+        mode === "until" ? t("form.errorTimePast") : t("form.errorTimeZero"),
       );
       return;
     }
     if (mins > 600) {
-      setError("Vamos ser realistas — máximo 10h.");
+      setError(t("form.errorTooLong"));
       return;
     }
     onSubmit({ user: user.trim(), minutes: mins });
@@ -53,7 +52,7 @@ export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
       <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium uppercase tracking-wider text-muted">
-            Seu usuário do Letterboxd
+            {t("form.userLabel")}
           </span>
           <div className="relative">
             <User
@@ -65,7 +64,7 @@ export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
               type="text"
               value={user}
               onChange={(e) => setUser(e.target.value)}
-              placeholder="ex: dave"
+              placeholder={t("form.userPlaceholder")}
               spellCheck={false}
               autoCapitalize="off"
               autoCorrect="off"
@@ -79,7 +78,7 @@ export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
 
         <div className="flex flex-col gap-1.5">
           <span className="text-xs font-medium uppercase tracking-wider text-muted">
-            Tempo disponível
+            {t("form.timeLabel")}
           </span>
           <div className="flex gap-2">
             <ModeToggle mode={mode} setMode={setMode} />
@@ -101,7 +100,7 @@ export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
                   className="w-full rounded-lg border border-border bg-surface px-9 py-3 text-base text-white outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/30"
                 />
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">
-                  min
+                  {t("form.minSuffix")}
                 </span>
               </div>
             ) : (
@@ -138,7 +137,7 @@ export function SearchForm({ onSubmit, loading, initialUser = "" }: Props) {
         )}
       >
         <Search size={18} />
-        {loading ? "buscando..." : "buscar filmes"}
+        {loading ? t("form.searchingButton") : t("form.searchButton")}
       </button>
     </form>
   );
@@ -151,6 +150,7 @@ function ModeToggle({
   mode: Mode;
   setMode: (m: Mode) => void;
 }) {
+  const t = useT();
   return (
     <div className="inline-flex rounded-lg border border-border bg-surface p-1">
       <button
@@ -163,7 +163,7 @@ function ModeToggle({
             : "text-muted hover:text-white",
         )}
       >
-        minutos
+        {t("form.modeMinutes")}
       </button>
       <button
         type="button"
@@ -173,7 +173,7 @@ function ModeToggle({
           mode === "until" ? "bg-accent text-bg" : "text-muted hover:text-white",
         )}
       >
-        até
+        {t("form.modeUntil")}
       </button>
     </div>
   );
