@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.claude/
 out/
 build/
 dist/
@@ -16,4 +17,3 @@ data/cache.db-shm
 *.log
 .DS_Store
 
-.claude/

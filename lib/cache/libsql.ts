@@ -40,7 +40,17 @@ export class LibSqlCache implements CacheRepository {
   constructor(url: string, authToken?: string) {
     if (url.startsWith("file:")) {
       const path = url.slice("file:".length);
-      if (path) mkdirSync(dirname(path) || ".", { recursive: true });
+      if (path) {
+        try {
+          mkdirSync(dirname(path) || ".", { recursive: true });
+        } catch (err) {
+          throw new Error(
+            `Não consegui criar o diretório do cache em "${path}". ` +
+              `Em serverless (Vercel) o filesystem é read-only — defina LIBSQL_URL apontando pra um Turso (libsql://...). ` +
+              `Original: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
     }
     this.client = createClient({ url, authToken });
   }
